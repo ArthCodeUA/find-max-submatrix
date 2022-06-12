@@ -1,9 +1,10 @@
 {
-  "name": "course-work",
+  "name": "find-max-submatrix",
   "version": "1.0.0",
-  "description": "",
+  "description": "Algorithms, that can be used to find continuous submatrix with maximum sum of its elements",
   "main": "generator.js",
   "scripts": {
+    "start": "node generator.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Kostya & Arthur",
