@@ -1,5 +1,6 @@
 import { greedy } from "./greedy.js";
 import { genetic } from "./genetic.js";
+import { performance } from "perf_hooks";
 
 String.prototype.replaceAt = function(index, replacement) {
     return this.substring(0, index) + replacement + this.substring(index + replacement.length);
@@ -35,5 +36,5 @@ function test(algorithms, times, [n, m, min, max], [gens, iterations, crossOverP
     return result;
 }
 
-console.dir(test([genetic, greedy], 1, [50, 50, -100, 300], [10000, 0, .5, .1]), {depth: null});
+console.dir(test([genetic, greedy], 5, [50, 50, -100, 300], [10000, 0, .5, .1]), {depth: null});
 // test([genetic], 1, [50, 50, -10000, 10000], [10000, 0, .5, .1]);

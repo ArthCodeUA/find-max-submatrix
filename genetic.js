@@ -1,4 +1,14 @@
-export function genetic(M, k, p, gens, maxValueForBytes, iterations, crossOverParameter, mutationParameter) {
+export function genetic(
+  M,
+  k,
+  p,
+  gens,
+  maxValueForBytes,
+  iterations,
+  crossOverParameter,
+  mutationParameter
+) {
+    // console.log(M, k, p)
   const g = gens;
   const m = M.length;
   const n = M[0].length;
@@ -10,10 +20,11 @@ export function genetic(M, k, p, gens, maxValueForBytes, iterations, crossOverPa
     return Math.floor(Math.random() * (max - min)) + min;
   };
   const genRandomPairs = () => {
-    const r1 = getRndInteger(0, m);
-    const r2 = getRndInteger(r1, m);
-    const c1 = getRndInteger(0, n);
-    const c2 = getRndInteger(c1, n);
+    const r1 = getRndInteger(0, m - k);
+    const r2 = r1 + k;
+    const c1 = getRndInteger(0, n - p);
+    const c2 = c1 + p;
+    // console.log({ r1, r2, c1, c2 });
     return { r1, r2, c1, c2 };
   };
 
@@ -25,7 +36,14 @@ export function genetic(M, k, p, gens, maxValueForBytes, iterations, crossOverPa
 
   const calculateF = (interval) => {
     let FValue = 0;
-    if (interval.r1 > interval.r2 || interval.c1 > interval.c2 || interval.r2 > m - 1 || interval.c2 > n - 1 || interval.c2 - interval.c1 !== k - 1 || interval.r2 - interval.r1 !== p - 1) {
+    if (
+      interval.r1 > interval.r2 ||
+      interval.c1 > interval.c2 ||
+      interval.r2 > m - 1 ||
+      interval.c2 > n - 1 ||
+      interval.c2 - interval.c1 !== p ||
+      interval.r2 - interval.r1 !== k
+    ) {
       return 0;
     }
     for (let i = interval.r1; i <= interval.r2; i++) {
@@ -75,11 +93,11 @@ export function genetic(M, k, p, gens, maxValueForBytes, iterations, crossOverPa
     comulative += generationCalculatedF[i].FPValue;
   }
   // console.log(
-  //   "Probability distribution",
-  //   generationCalculatedF.reduce((prev, current) =>
-  //     Object.assign({ FPValue: prev.FPValue + current.FPValue })
-  //   )
-  // );
+//     "Probability distribution",
+//     generationCalculatedF.reduce((prev, current) =>
+//       Object.assign({ FPValue: prev.FPValue + current.FPValue })
+//     )
+//   );
   // console.log(generationCalculatedF);
 
   newGeneration = newGeneration.map((chromosome) => {
@@ -116,8 +134,12 @@ export function genetic(M, k, p, gens, maxValueForBytes, iterations, crossOverPa
   });
 
   const crossOver = (ch1, ch2) => {
-    const temp = ch1.binary.rep.slice(0, crossOverIndex).concat(ch2.binary.rep.slice(crossOverIndex));
-    ch2.binary.rep = ch2.binary.rep.slice(0, crossOverIndex).concat(ch1.binary.rep.slice(crossOverIndex));
+    const temp = ch1.binary.rep
+      .slice(0, crossOverIndex)
+      .concat(ch2.binary.rep.slice(crossOverIndex));
+    ch2.binary.rep = ch2.binary.rep
+      .slice(0, crossOverIndex)
+      .concat(ch1.binary.rep.slice(crossOverIndex));
     ch1.binary.rep = temp;
   };
 
@@ -127,16 +149,21 @@ export function genetic(M, k, p, gens, maxValueForBytes, iterations, crossOverPa
 
   const mutate = (generation) => {
     const mutatedIndexes = [];
-    const hasIndexBeenMutated = (index) => mutatedIndexes.find(x => x[0] === index[0] && x[1] === index[1]);
+    const hasIndexBeenMutated = (index) =>
+      mutatedIndexes.find((x) => x[0] === index[0] && x[1] === index[1]);
     const invertGene = (chromosome, index) => {
-      chromosome.binary.rep = chromosome.binary.rep.replaceAt(index, String(chromosome.binary.rep[index] ^ 1));
+      chromosome.binary.rep = chromosome.binary.rep.replaceAt(
+        index,
+        String(chromosome.binary.rep[index] ^ 1)
+      );
     };
 
     for (let i = 0; i < valuesToBeMutated; i++) {
       let index = [];
       do {
         index = [getRndInteger(0, g), getRndInteger(0, maxBytes * 4)];
-      } while (hasIndexBeenMutated(index)) {
+      } while (hasIndexBeenMutated(index));
+      {
         index = [getRndInteger(0, g), getRndInteger(0, maxBytes * 4)];
       }
       invertGene(generation[index[0]], index[1]);
@@ -148,18 +175,26 @@ export function genetic(M, k, p, gens, maxValueForBytes, iterations, crossOverPa
   newGeneration = newGeneration.map((chromosome) => {
     const r1 = parseInt(chromosome.binary.rep.slice(0, maxBytes), 2);
     const r2 = parseInt(chromosome.binary.rep.slice(maxBytes, maxBytes * 2), 2);
-    const c1 = parseInt(chromosome.binary.rep.slice(maxBytes * 2, maxBytes * 3), 2);
-    const c2 = parseInt(chromosome.binary.rep.slice(maxBytes * 3, maxBytes * 4), 2);
+    const c1 = parseInt(
+      chromosome.binary.rep.slice(maxBytes * 2, maxBytes * 3),
+      2
+    );
+    const c2 = parseInt(
+      chromosome.binary.rep.slice(maxBytes * 3, maxBytes * 4),
+      2
+    );
     // console.log(r1, r2, c1, c2);
-    chromosome.newFValue = calculateF({r1, r2, c1, c2});
+    chromosome.newFValue = calculateF({ r1, r2, c1, c2 });
     return chromosome;
   });
 
-  const correctAnswer = Math.max(...newGeneration.map((chromosome) => chromosome.newFValue));
+  const correctAnswer = Math.max(
+    ...newGeneration.map((chromosome) => chromosome.newFValue)
+  );
 
   // console.log(newGeneration);
   // console.log(M);
   // console.log(correctAnswer);
-  
+
   return correctAnswer;
 }
