@@ -90,6 +90,7 @@ export function genetic(
         index = [getRndInteger(0, g), getRndInteger(0, maxBytes * 4)];
       }
       invertGene(generation[index[0]], index[1]);
+      mutatedIndexes.push(index);
     }
   };
 
@@ -97,7 +98,7 @@ export function genetic(
     .map((chromosome) => {
       return { ...chromosome, FValue: calculateF(chromosome) };
     })
-    .filter((chromosome) => chromosome.FValue != undefined);
+    .filter((chromosome) => chromosome.FValue !== undefined);
 
   for (let iter = 0; iter < iterations; iter++) {
     try {
