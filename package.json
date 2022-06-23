@@ -9,8 +9,7 @@
   },
   "author": "Kostya & Arthur",
   "license": "ISC",
-  "type": "module",
   "dependencies": {
-    "plotly.js-dist-min": "2.12.1"
+    "plotly": "1.0.6"
   }
 }

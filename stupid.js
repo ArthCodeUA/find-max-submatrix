@@ -1,4 +1,4 @@
-export function stupid(M, k, p) {
+module.exports = function stupid(M, k, p) {
   let maxSubMatrix = 0;
   for (let i = 0; i < M.length; i++) {
     for (let j = 0; j < M[0].length; j++) {

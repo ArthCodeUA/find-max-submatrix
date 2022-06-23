@@ -4,7 +4,7 @@ const isValidRow = (row, i, matrix) => row[0] === 0 || row[0] === matrix.length 
 const getWorstRow = (matrix) => matrix.map((row, i) => [i, getArraySum(row)]).sort((a, b) => a[1] - b[1]).find(isValidRow)[0];
 const transpose = (matrix) => matrix[0].map((_, col) => matrix.map(x => x[col]));
 
-export function greedy(matrix, k, p) {
+module.exports = function greedy(matrix, k, p) {
     let count = 0;
     while(matrix.length * matrix[0].length !== k * p) {
         if (matrix.length > (count % 2 === 0 ? k : p)) {

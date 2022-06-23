@@ -1,4 +1,4 @@
-export function genetic(
+module.exports = function genetic(
   M,
   k,
   p,
