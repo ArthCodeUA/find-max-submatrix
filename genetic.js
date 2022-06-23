@@ -31,7 +31,6 @@ export function genetic(
   for (let i = 0; i < g; i++) {
     generation.push(genRandomPairs());
   }
-
   const calculateF = (interval) => {
     let FValue = 0;
     if (
@@ -155,7 +154,6 @@ export function genetic(
         crossOver(newGeneration[i], newGeneration[i + 1]);
       }
       mutate(newGeneration);
-
       newGeneration = newGeneration.map((chromosome) => {
         const r1 = parseInt(chromosome.binary.rep.slice(0, maxBytes), 2);
         const r2 = parseInt(
@@ -175,7 +173,8 @@ export function genetic(
         return chromosome;
       });
       correctAnswer = Math.max(
-        ...newGeneration.map((chromosome) => chromosome.newFValue)
+        correctAnswer,
+        Math.max(...newGeneration.map((chromosome) => chromosome.newFValue))
       );
       generationCalculatedF = newGeneration.map((chromosome) => {
         return { ...chromosome.current, FValue: chromosome.newFValue };
