@@ -26,25 +26,50 @@ const testAlgorithm = (algorithm, values) => {
     const startTime = performance.now();
     const result = algorithm(...value);
     const endTime = performance.now();
-    results.push({ value: result, time: endTime - startTime, matrixSize: value[0].length });
+    results.push({ value: result, time: endTime - startTime, matrixSize: value[0].length * value[0][0].length });
   }
   return { result: results, name: algorithm.name };
 };
 
+const dispatchGraph = (result) => {
+  plotly.plot(result.map(test => {
+    const dataset = {};
+    dataset.x = test.result.map(result => result.matrixSize);
+    dataset.y = test.result.map(result => result.time);
+    dataset.name = test.name;
+    dataset.type = "scatter";
+    return dataset;
+  }), {filename: "time-chart", fileopt: "overwrite"});
+  plotly.plot(result.map(test => {
+    const dataset = {};
+    dataset.x = test.result.map(result => result.matrixSize);
+    dataset.y = test.result.map(result => result.value);
+    dataset.name = test.name;
+    dataset.type = "scatter";
+    return dataset;
+  }), {filename: "value-chart", fileopt: "overwrite"});
+}
+
+const sizeGenerator = function* (base, step, until) {
+    let size = base;
+    yield size;
+    while (size < until) {
+        yield size += step;
+    }
+}
+
 function test(
   algorithms,
-  times,
+  sizeGenerator,
   [min, max],
   [gens, iterations, crossOverParameter, mutationParameter]
 ) {
   const result = [];
   const values = [];
-  let matrixSize = 0;
-  for (let i = 0; i < times; i++) {
-    matrixSize += 50;
-    const matrix = generate(matrixSize, matrixSize, min, max);
-    const k = getRandomInt(1, matrixSize - 1);
-    const p = getRandomInt(1, matrixSize - 1);
+  for (let n of sizeGenerator) {
+    const matrix = generate(n, n, min, max);
+    const k = getRandomInt(1, n - 1);
+    const p = getRandomInt(1, n - 1);
     values.push([
       matrix,
       k,
@@ -59,28 +84,16 @@ function test(
   for (let algorithm of algorithms) {
     result.push(testAlgorithm(algorithm, values));
   }
-  plotly.plot(result.map(test => {
-      const dataset = {};
-      dataset.x = test.result.map(result => result.matrixSize);
-      dataset.y = test.result.map(result => result.time);
-      dataset.type = "scatter";
-      return dataset;
-  }), {filename: "time-chart", fileopt: "overwrite"}, function (err, msg) {
-      console.log(msg);
-  });
-  plotly.plot(result.map(test => {
-      const dataset = {};
-      dataset.x = test.result.map(result => result.matrixSize);
-      dataset.y = test.result.map(result => result.value);
-      dataset.type = "scatter";
-      return dataset;
-  }), {filename: "value-chart", fileopt: "overwrite"}, function (err, msg) {
-      console.log(msg);
-  });
+  dispatchGraph(result);
   return result;
 }
 
-const testing = test([greedy, genetic, stupid], 10, [50, 40, -1000, 3000], [10000, 2, 0.5, 0.1]);
+const testing = test(
+  [greedy, genetic],
+  sizeGenerator(50, 100, 2000),
+  [-100, 300],
+  [10000, 2, 0.5, 0.1]
+);
 
 console.dir(
   testing,
